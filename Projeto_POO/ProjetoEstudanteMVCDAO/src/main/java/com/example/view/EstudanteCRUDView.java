@@ -14,6 +14,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
 import com.example.Estudante;
+import com.example.controller.EstudanteController;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,7 +35,7 @@ public class EstudanteCRUDView {
     Alert mensagemAlerta;
 
     // Método construtor que irá inicializar todos os elementos de interface da tela
-    public EstudanteCRUDView(){
+    public EstudanteCRUDView(EstudanteController estudanteController) {
 
         // Mensagem de Alerta do tipo WARNING e suas propriedades
         mensagemAlerta = new Alert(Alert.AlertType.WARNING);
@@ -91,6 +92,7 @@ public class EstudanteCRUDView {
             public void handle(ActionEvent e) {
                 Estudante estudante = new Estudante(textFieldNome.getText(), textFieldRGA.getText()); // Cria um estudante a partir dos dados das caixas de texto
                 listaDadosEstudantes.add(estudante); // Insere o estudante na lista observável
+                estudanteController.inserirEstudante(estudante); // Insere o estudante no banco de dados
                 limparTextFields(); // Limpa caixas de texto
             }
         });
@@ -101,6 +103,7 @@ public class EstudanteCRUDView {
                 int i = tabelaEstudantes.getSelectionModel().getSelectedIndex(); // Pega a posição da linha selecionada da tabela
                 Estudante estudante = new Estudante(textFieldNome.getText(), textFieldRGA.getText()); // Cria um estudante a partir dos dados das caixas de texto
                 listaDadosEstudantes.set(i, estudante); // Atualiza o estudante na lista observável para a posição obtida
+                estudanteController.atualizarEstudante(estudante); // Atualiza o estudante no banco de dados
                 limparTextFields(); // Limpa caixas de texto
             }
         });
@@ -114,6 +117,7 @@ public class EstudanteCRUDView {
                 } else {
                     Estudante estudante = tabelaEstudantes.getSelectionModel().getSelectedItem();  // Cria um estudante a partir dos dados linha selecionada na tabela
                     listaDadosEstudantes.remove(estudante); // Remove o estudante da lista observável
+                    estudanteController.excluirEstudantePorRGA(estudante.getRGA()); // Exclui o estudante no banco de dados
                     limparTextFields(); // Limpa caixas de texto
                 }
             }

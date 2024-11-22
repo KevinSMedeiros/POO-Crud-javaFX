@@ -8,23 +8,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import com.example.Estudante;
 
 public class EstudanteDAOImpl implements EstudanteDAO {
 
     public Connection conexao;
 
-    public EstudanteDAOImpl(Connection conexao) {
-        this.conexao = conexao; // conexão com Banco
+    public EstudanteDAOImpl() {
+         // conexão com Banco
     }
 
     // implementação dos métodos da interface EstudanteDAO para JDBC/SQL
     @Override
-    public void inserir(Estudante estudante) {
+    public void inserir(Estudante estudante, Connection conexao) {
         String inserir = "INSERT INTO estudantes (estudanteNome, estudanteRGA) values (?,?)";
         try {
-            PreparedStatement statementInserir = this.conexao.prepareStatement(inserir);
+            PreparedStatement statementInserir = conexao.prepareStatement(inserir);
 
             statementInserir.setString(1, estudante.getNome());
             statementInserir.setString(2, estudante.getRGA());

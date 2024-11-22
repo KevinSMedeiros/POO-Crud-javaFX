@@ -27,25 +27,19 @@ public class Main extends Application { // A classe principal deve estender a cl
          System.out.println("Hello, Meu projeto MVC + DAO via JDBC!");
 
         // organizar seus dados de conexão em strings é uma boa ideia!
-        String mySQLURL = "jdbc:mysql://localhost:3306"; // informar o nome do banco no final da URL é opcional
+        String mySQLURL = "jdbc:mysql://localhost:3306/bdalg3"; // informar o nome do banco no final da URL é opcional
         String usuario = "root";
         String senha = "";
 
-        // realiza a conexão com o banco
-        try (Connection conexao = DriverManager.getConnection(mySQLURL, usuario, senha)) {
 
-            if (conexao != null) {
-                System.out.println("Conectado com sucesso à instância MySQL!");
-            }
-
-            EstudanteController estudanteController = new EstudanteController(conexao, stage); // inicialização da controladora com a conexão do banco
-
-            conexao.close(); // fecha a conexão com o banco - sempre fechar após o uso!
-
-        } catch (SQLException ex) {
-            System.out.println("Houve um problema com a conexão.");
-            ex.printStackTrace();
-        }
+            EstudanteController estudanteController = new EstudanteController(); // inicialização da controladora com a conexão do banco
+            EstudanteCRUDView ec = new EstudanteCRUDView(estudanteController);
+             
+            // Propriedades do palco onde a aplicação acontece
+            stage.setTitle("Projeto CRUD Estudante com JavaFX"); // Título do palco
+            stage.setScene(ec.getScene()); // Tela/cena a ser carregada ao iniciar o palco
+            stage.show(); // Inicia o palco
+            
     }
 
     public static void main(String[] args) {

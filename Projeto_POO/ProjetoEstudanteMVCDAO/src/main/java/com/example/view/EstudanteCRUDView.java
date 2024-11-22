@@ -66,6 +66,9 @@ public class EstudanteCRUDView {
         tabelaEstudantes = new TableView<>();
         listaDadosEstudantes = FXCollections.observableArrayList(); // Lista de dados observáveis a ser carregada para a tabela
         tabelaEstudantes.setItems(listaDadosEstudantes);
+        for (Estudante estudante : estudanteController.mostrarEstudantes()) { // Carrega os dados do banco de dados para a lista observável
+            listaDadosEstudantes.add(estudante);
+        }
         
         //TableColumns - colunas da tabela e suas propriedades
         colunaRGA = new TableColumn<>("RGA");

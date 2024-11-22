@@ -8,9 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import com.example.Estudante;
 
 public class EstudanteDAOImpl implements EstudanteDAO {
@@ -26,6 +24,11 @@ public class EstudanteDAOImpl implements EstudanteDAO {
     public void inserir(Estudante estudante, Connection conexao) {
         String inserir = "INSERT INTO estudantes (estudanteNome, estudanteRGA) values (?,?)";
         try {
+            Estudante existe = this.buscarPorRGA(estudante.getRGA(), conexao);
+            if(existe != null){
+                System.out.println("Estudante com este RGA já existe!");
+                return;
+            }
             PreparedStatement statementInserir = conexao.prepareStatement(inserir);
 
             statementInserir.setString(1, estudante.getNome());
@@ -39,12 +42,13 @@ public class EstudanteDAOImpl implements EstudanteDAO {
     }
 
     @Override
-    public void atualizar(Estudante estudante, String nome) {
+    public void atualizar(Estudante estudante, String nome, Connection conexao) {
         String atualizar = "UPDATE estudantes SET estudanteNome=? WHERE estudanteRGA=?";
         try {
-            PreparedStatement statementAtualizar = this.conexao.prepareStatement(atualizar);
+            PreparedStatement statementAtualizar = conexao.prepareStatement(atualizar);
             statementAtualizar.setString(1, nome);
             statementAtualizar.setString(2, estudante.getRGA());
+            
             statementAtualizar.executeUpdate();
             System.out.println("Estudante atualizado com sucesso!");
         } catch (SQLException e) {
@@ -53,13 +57,13 @@ public class EstudanteDAOImpl implements EstudanteDAO {
     }
 
     @Override
-    public void excluir(String RGA) {
-        Estudante estudante = this.buscarPorRGA(RGA);
+    public void excluir(String RGA, Connection conexao) {
+        Estudante estudante = this.buscarPorRGA(RGA, conexao);
         if (estudante != null) {
             System.out.println("Excluindo estudante...");
             String excluir = "DELETE FROM estudantes WHERE estudanteRGA=" + RGA;
             try {
-                PreparedStatement statementExcluir = this.conexao.prepareStatement(excluir);
+                PreparedStatement statementExcluir = conexao.prepareStatement(excluir);
                 statementExcluir.executeUpdate();
                 System.out.println("Estudante excluído com sucesso! " + estudante.getRGA() + ": " + estudante.getNome().toUpperCase());
             } catch (SQLException e) {
@@ -69,11 +73,11 @@ public class EstudanteDAOImpl implements EstudanteDAO {
     }
 
     @Override
-    public Estudante buscarPorRGA(String RGA) {
+    public Estudante buscarPorRGA(String RGA, Connection conexao) {
         String buscarPorRGA = "SELECT * FROM estudantes WHERE estudanteRGA=" + RGA;
         Estudante estudante = null;
         try {
-            Statement statementBuscarPorRGA = this.conexao.createStatement();
+            Statement statementBuscarPorRGA = conexao.createStatement();
             ResultSet registros = statementBuscarPorRGA.executeQuery(buscarPorRGA);
             if (registros.next()) {
                 estudante = new Estudante(registros.getString("estudanteNome"), registros.getString("estudanteRGA"));
@@ -88,11 +92,11 @@ public class EstudanteDAOImpl implements EstudanteDAO {
     }
 
     @Override
-    public ArrayList<Estudante> buscarTodos() {
+    public ArrayList<Estudante> buscarTodos(Connection conexao) {
         String buscarTodos = "SELECT * FROM estudantes";
         ArrayList<Estudante> listaEstudantes = new ArrayList<Estudante>();
         try {
-            Statement statementBuscarTodos = this.conexao.createStatement();
+            Statement statementBuscarTodos = conexao.createStatement();
             ResultSet registros = statementBuscarTodos.executeQuery(buscarTodos);
             while (registros.next()) {
                 Estudante estudante = new Estudante(registros.getString("estudanteNome"),

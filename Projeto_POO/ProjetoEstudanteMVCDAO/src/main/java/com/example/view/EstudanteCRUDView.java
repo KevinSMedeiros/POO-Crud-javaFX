@@ -23,19 +23,34 @@ import javafx.event.EventHandler;
 
 public class EstudanteCRUDView {
 
-    Label labelRGA, labelNome;
-    TextField textFieldRGA, textFieldNome;
+    Label labelRGA, labelNome, labelCurso;
+    TextField textFieldRGA, textFieldNome, textFieldCurso;
     Button botaoCadastrar, botaoAtualizar, botaoExcluir;
     VBox vbox;
     HBox barraBotoes;
     Scene scene;
     TableView<Estudante> tabelaEstudantes;
-    TableColumn<Estudante, String> colunaRGA, colunaNome;
+    TableColumn<Estudante, String> colunaRGA, colunaNome, colunaCurso;
     ObservableList<Estudante> listaDadosEstudantes;
     Alert mensagemAlerta;
+    TextField textFieldPesquisa;
+    Button botaoPesquisar;
 
     // Método construtor que irá inicializar todos os elementos de interface da tela
     public EstudanteCRUDView(EstudanteController estudanteController) {
+
+        // TexFields - pesquisa de estudantes
+        textFieldPesquisa = new TextField();
+        textFieldPesquisa.setPromptText("Pesquisar estudante por RGA ou Nome");
+        textFieldPesquisa.setMaxWidth(400);
+
+        // Botão para realizar a pesquisa
+        botaoPesquisar = new Button("Pesquisar");
+    
+        // HBox para a barra de pesquisa
+        HBox barraPesquisa = new HBox(textFieldPesquisa, botaoPesquisar);
+        barraPesquisa.setSpacing(10);
+        barraPesquisa.setAlignment(Pos.CENTER);
 
         // Mensagem de Alerta do tipo WARNING e suas propriedades
         mensagemAlerta = new Alert(Alert.AlertType.WARNING);
@@ -45,12 +60,15 @@ public class EstudanteCRUDView {
         // Labels - rótulos de texto
         labelRGA = new Label("RGA:");
         labelNome = new Label("Nome do(a) Estudante:");
+        labelCurso = new Label("Curso:");
 
         // TextFields - campos de entrada de texto
         textFieldRGA = new TextField();
         textFieldRGA.setMaxWidth(100);
         textFieldNome = new TextField();
         textFieldNome.setMaxWidth(400);
+        textFieldCurso = new TextField();
+        textFieldCurso.setMaxWidth(400);
 
         // Buttons - botões
         botaoCadastrar = new Button("Cadastrar Novo Estudante");
@@ -72,14 +90,26 @@ public class EstudanteCRUDView {
         
         //TableColumns - colunas da tabela e suas propriedades
         colunaRGA = new TableColumn<>("RGA");
-        colunaRGA.setPrefWidth(164.0);
+        colunaRGA.setMinWidth(150.0);
+        colunaRGA.setMaxWidth(200.0);
+        colunaRGA.setPrefWidth(175.0);
         colunaRGA.setCellValueFactory(cellData -> cellData.getValue().RGAProperty());
+
         colunaNome = new TableColumn<>("Nome");
-        colunaNome.setPrefWidth(485.0);
+        colunaNome.setMinWidth(200.0);
+        colunaNome.setMaxWidth(350.0);
+        colunaNome.setPrefWidth(275.0);
         colunaNome.setCellValueFactory(cellData -> cellData.getValue().nomeProperty());
 
+        colunaCurso = new TableColumn<>("Curso");
+        colunaCurso.setMinWidth(150.0);
+        colunaCurso.setMaxWidth(250.0);
+        colunaCurso.setPrefWidth(200.0);
+        colunaCurso.setCellValueFactory(cellData -> cellData.getValue().cursoProperty());
+        
+
         // Carrega as colunas na tabela
-        tabelaEstudantes.getColumns().addAll(colunaRGA, colunaNome);
+        tabelaEstudantes.getColumns().addAll(colunaRGA, colunaNome, colunaCurso);
 
         // Listener para carregar as informações da linha selecionada na tabela para as caixas de texto
         tabelaEstudantes.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -88,12 +118,32 @@ public class EstudanteCRUDView {
                 textFieldRGA.setText(newSelection.getRGA());
             }
         });
+
+        // Ação do botão Pesquisar
+        botaoPesquisar.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent e) {
+                String filtro = textFieldPesquisa.getText().trim().toLowerCase();
+                if (!filtro.isEmpty()) {
+                    ObservableList<Estudante> estudantesFiltrados = FXCollections.observableArrayList();
+                    for (Estudante estudante : estudanteController.mostrarEstudantes()) {
+                        if (estudante.getRGA().toLowerCase().contains(filtro) ||
+                            estudante.getNome().toLowerCase().contains(filtro)) {
+                            estudantesFiltrados.add(estudante);
+                        }
+                    }
+                    tabelaEstudantes.setItems(estudantesFiltrados); // Atualiza a tabela com os resultados filtrados
+                } else {
+                    tabelaEstudantes.setItems(listaDadosEstudantes); // Restaura a tabela com todos os estudantes
+                }
+            }
+        });
         
         // Ações dos botões das operações de CRUD de Estudante na interface
         botaoCadastrar.setOnAction(new EventHandler<ActionEvent>() { // Cadastrar Estudante
             @Override
             public void handle(ActionEvent e) {
-                Estudante estudante = new Estudante(textFieldNome.getText(), textFieldRGA.getText()); // Cria um estudante a partir dos dados das caixas de texto
+                Estudante estudante = new Estudante(textFieldNome.getText(), textFieldRGA.getText(), textFieldCurso.getText()); // Cria um estudante a partir dos dados das caixas de texto
                 listaDadosEstudantes.add(estudante); // Insere o estudante na lista observável
                 estudanteController.inserirEstudante(estudante); // Insere o estudante no banco de dados
                 limparTextFields(); // Limpa caixas de texto
@@ -104,7 +154,7 @@ public class EstudanteCRUDView {
             @Override
             public void handle(ActionEvent e) {
                 int i = tabelaEstudantes.getSelectionModel().getSelectedIndex(); // Pega a posição da linha selecionada da tabela
-                Estudante estudante = new Estudante(textFieldNome.getText(), textFieldRGA.getText()); // Cria um estudante a partir dos dados das caixas de texto
+                Estudante estudante = new Estudante(textFieldNome.getText(), textFieldRGA.getText(), textFieldCurso.getText()); // Cria um estudante a partir dos dados das caixas de texto
                 listaDadosEstudantes.set(i, estudante); // Atualiza o estudante na lista observável para a posição obtida
                 estudanteController.atualizarEstudante(estudante); // Atualiza o estudante no banco de dados
                 limparTextFields(); // Limpa caixas de texto
@@ -125,9 +175,10 @@ public class EstudanteCRUDView {
                 }
             }
         });
+
         
         // VBox - caixa vertical que contém todos os elementos da tela/cena e suas propriedades 
-        vbox = new VBox(labelRGA, textFieldRGA, labelNome, textFieldNome, barraBotoes, tabelaEstudantes);
+        vbox = new VBox(labelRGA, textFieldRGA, labelNome, textFieldNome, labelCurso, textFieldCurso, barraBotoes, barraPesquisa, tabelaEstudantes);
         vbox.setSpacing(10);
         vbox.setAlignment(Pos.CENTER);
         scene = new Scene(vbox, 650, 500); // Neste caso a VBox está funcionando como o layout da telan/cena
@@ -137,9 +188,10 @@ public class EstudanteCRUDView {
         return this.scene;
     }
     
-    public void limparTextFields(){ // Método para limpar as caixas de texto
+    public void limparTextFields() {
         textFieldRGA.clear();
         textFieldNome.clear();
+        textFieldCurso.clear(); // Limpa o campo do curso
     }
     
 }

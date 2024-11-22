@@ -22,7 +22,7 @@ public class EstudanteDAOImpl implements EstudanteDAO {
     // implementação dos métodos da interface EstudanteDAO para JDBC/SQL
     @Override
     public void inserir(Estudante estudante, Connection conexao) {
-        String inserir = "INSERT INTO estudantes (estudanteNome, estudanteRGA) values (?,?)";
+        String inserir = "INSERT INTO estudantes (estudanteNome, estudanteRGA, estudanteCurso) VALUES (?, ?, ?)";;
         try {
             Estudante existe = this.buscarPorRGA(estudante.getRGA(), conexao);
             if(existe != null){
@@ -33,6 +33,7 @@ public class EstudanteDAOImpl implements EstudanteDAO {
 
             statementInserir.setString(1, estudante.getNome());
             statementInserir.setString(2, estudante.getRGA());
+            statementInserir.setString(3, estudante.getCurso());
             statementInserir.executeUpdate();
 
             System.out.println(estudante.getNome().toUpperCase()+" registro de estudante inserido com sucesso!");
@@ -43,11 +44,12 @@ public class EstudanteDAOImpl implements EstudanteDAO {
 
     @Override
     public void atualizar(Estudante estudante, String nome, Connection conexao) {
-        String atualizar = "UPDATE estudantes SET estudanteNome=? WHERE estudanteRGA=?";
+        String atualizar = "UPDATE estudantes SET estudanteNome=?, estudanteCurso=? WHERE estudanteRGA=?";
         try {
             PreparedStatement statementAtualizar = conexao.prepareStatement(atualizar);
             statementAtualizar.setString(1, nome);
-            statementAtualizar.setString(2, estudante.getRGA());
+            statementAtualizar.setString(2, estudante.getCurso());
+            statementAtualizar.setString(3, estudante.getRGA());
             
             statementAtualizar.executeUpdate();
             System.out.println("Estudante atualizado com sucesso!");
@@ -74,13 +76,25 @@ public class EstudanteDAOImpl implements EstudanteDAO {
 
     @Override
     public Estudante buscarPorRGA(String RGA, Connection conexao) {
-        String buscarPorRGA = "SELECT * FROM estudantes WHERE estudanteRGA=" + RGA;
+        // Use o placeholder "?" para o parâmetro RGA
+        String buscarPorRGA = "SELECT * FROM estudantes WHERE estudanteRGA = ?";
         Estudante estudante = null;
         try {
-            Statement statementBuscarPorRGA = conexao.createStatement();
-            ResultSet registros = statementBuscarPorRGA.executeQuery(buscarPorRGA);
+            // Prepara a consulta com o placeholder
+            PreparedStatement statementBuscarPorRGA = conexao.prepareStatement(buscarPorRGA);
+            
+            // Define o valor do parâmetro RGA
+            statementBuscarPorRGA.setString(1, RGA);
+            
+            // Executa a consulta
+            ResultSet registros = statementBuscarPorRGA.executeQuery();
+            
             if (registros.next()) {
-                estudante = new Estudante(registros.getString("estudanteNome"), registros.getString("estudanteRGA"));
+                estudante = new Estudante(
+                    registros.getString("estudanteNome"),
+                    registros.getString("estudanteRGA"),
+                    registros.getString("estudanteCurso") // Obtém o curso
+                );
                 System.out.println("Registro de estudante encontrado com sucesso!");
             } else {
                 System.out.println("Estudante não encontrado.");
@@ -94,13 +108,16 @@ public class EstudanteDAOImpl implements EstudanteDAO {
     @Override
     public ArrayList<Estudante> buscarTodos(Connection conexao) {
         String buscarTodos = "SELECT * FROM estudantes";
-        ArrayList<Estudante> listaEstudantes = new ArrayList<Estudante>();
+        ArrayList<Estudante> listaEstudantes = new ArrayList<>();
         try {
             Statement statementBuscarTodos = conexao.createStatement();
             ResultSet registros = statementBuscarTodos.executeQuery(buscarTodos);
             while (registros.next()) {
-                Estudante estudante = new Estudante(registros.getString("estudanteNome"),
-                        registros.getString("estudanteRGA"));
+                Estudante estudante = new Estudante(
+                    registros.getString("estudanteNome"),
+                    registros.getString("estudanteRGA"),
+                    registros.getString("estudanteCurso") // Adiciona o curso
+                );
                 listaEstudantes.add(estudante);
             }
             System.out.println("Lista de estudantes retornada com sucesso!");

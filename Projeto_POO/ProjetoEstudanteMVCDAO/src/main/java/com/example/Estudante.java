@@ -1,40 +1,54 @@
-// Esta é a classe conceitual de Estudante
+// Essa é classe conceitual de Estudantes
 package com.example;
 
-// Imports JavaFX
+// Imports do JavaFX
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class Estudante {
-    private String nome, RGA;
+    private StringProperty nome;
+    private StringProperty RGA;
+    private StringProperty curso;
 
-    public Estudante(String nome, String RGA) {
-        this.setNome(nome);
-        this.setRGA(RGA);
+    public Estudante(String nome, String RGA, String curso) {
+        this.nome = new SimpleStringProperty(nome);
+        this.RGA = new SimpleStringProperty(RGA);
+        this.curso = new SimpleStringProperty(curso);
     }
 
     public String getNome() {
-        return nome;
+        return nome.get();
     }
 
     public void setNome(String nome) {
-        this.nome = nome;
+        this.nome.set(nome);
+    }
+
+    public StringProperty nomeProperty() {
+        return nome;
     }
 
     public String getRGA() {
-        return RGA;
+        return RGA.get();
     }
 
     public void setRGA(String RGA) {
-        this.RGA = RGA;
-    }
-
-    // Criação de métodos para obter dados observáveis (properties) a partir do modelo
-    public StringProperty nomeProperty() {
-        return new SimpleStringProperty(this.getNome());
+        this.RGA.set(RGA);
     }
 
     public StringProperty RGAProperty() {
-        return new SimpleStringProperty(this.getRGA());
+        return RGA;
+    }
+
+    public String getCurso() {
+        return curso.get();
+    }
+
+    public void setCurso(String curso) {
+        this.curso.set(curso);
+    }
+
+    public StringProperty cursoProperty() {
+        return curso;
     }
 }

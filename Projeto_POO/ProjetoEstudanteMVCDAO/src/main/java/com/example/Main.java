@@ -44,7 +44,6 @@ public class Main extends Application { // A classe principal deve estender a cl
 
     public static void main(String[] args) {
        
-        
         launch(); // carrega a aplicação
     }
 

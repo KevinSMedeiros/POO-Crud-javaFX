@@ -23,7 +23,7 @@ import javafx.event.EventHandler;
 
 public class EstudanteCRUDView {
 
-    Label labelRGA, labelNome, labelCurso;
+    Label labelRGA, labelNome, labelCurso, labelTopo;
     TextField textFieldRGA, textFieldNome, textFieldCurso;
     Button botaoCadastrar, botaoAtualizar, botaoExcluir;
     VBox vbox;
@@ -38,6 +38,10 @@ public class EstudanteCRUDView {
 
     // Método construtor que irá inicializar todos os elementos de interface da tela
     public EstudanteCRUDView(EstudanteController estudanteController) {
+
+        // Nome estudantes
+        labelTopo = new Label("Alunos: Leandro Moreira de Carvalho e Kevin da Silva Medeiros");
+        labelTopo.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         // TexFields - pesquisa de estudantes
         textFieldPesquisa = new TextField();
@@ -178,7 +182,7 @@ public class EstudanteCRUDView {
 
         
         // VBox - caixa vertical que contém todos os elementos da tela/cena e suas propriedades 
-        vbox = new VBox(labelRGA, textFieldRGA, labelNome, textFieldNome, labelCurso, textFieldCurso, barraBotoes, barraPesquisa, tabelaEstudantes);
+        vbox = new VBox(labelTopo, labelRGA, textFieldRGA, labelNome, textFieldNome, labelCurso, textFieldCurso, barraBotoes, barraPesquisa, tabelaEstudantes);
         vbox.setSpacing(10);
         vbox.setAlignment(Pos.CENTER);
         scene = new Scene(vbox, 650, 500); // Neste caso a VBox está funcionando como o layout da telan/cena

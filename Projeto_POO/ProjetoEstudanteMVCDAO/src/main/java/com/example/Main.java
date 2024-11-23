@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 
-import com.example.view.EstudanteCRUDView;
+import com.example.view.CarroCRUDView;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 
-import com.example.controller.EstudanteController;
+import com.example.controller.CarroController;
 
 
 public class Main extends Application { // A classe principal deve estender a classe Application
@@ -32,11 +32,11 @@ public class Main extends Application { // A classe principal deve estender a cl
         String senha = "";
 
 
-            EstudanteController estudanteController = new EstudanteController(); // inicialização da controladora com a conexão do banco
-            EstudanteCRUDView ec = new EstudanteCRUDView(estudanteController);
+            CarroController CarroController = new CarroController(); // inicialização da controladora com a conexão do banco
+            CarroCRUDView ec = new CarroCRUDView(CarroController);
              
             // Propriedades do palco onde a aplicação acontece
-            stage.setTitle("Projeto CRUD Estudante com JavaFX"); // Título do palco
+            stage.setTitle("Projeto CRUD Carro com JavaFX"); // Título do palco
             stage.setScene(ec.getScene()); // Tela/cena a ser carregada ao iniciar o palco
             stage.show(); // Inicia o palco
             

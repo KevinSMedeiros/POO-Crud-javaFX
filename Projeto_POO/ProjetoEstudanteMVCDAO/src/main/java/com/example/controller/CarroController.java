@@ -3,19 +3,31 @@ package com.example.controller;
 
 import com.example.Carro;
 import com.example.model.*; // import do Modelo
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 //imports Java
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CarroController {
 
     CarroDAOImpl CarroModel;
-
+    CSVHandler CSVHandler; // Cria uma instância do gerenciador de dados CSVHandler
+    private ObservableList<Carro> listaDadosEstudantes; // Cria uma lista de dados do tipo Estudante
     public CarroController() {
 
-        this.CarroModel = new CarroDAOImpl(); // inicia o Model de Carro
+        //this.CarroModel = new CarroDAOImpl(); // inicia o Model de Carro
+        // Parte do CSV
+        this.CSVHandler = new CSVHandler(); // Instancia o gerenciador de dados CSVHandler
+
+        this.listaDadosEstudantes = FXCollections.observableArrayList(); // Cria uma lista observable de dados do tipo Estudante
+        List<Carro> listaCarros = this.CSVHandler.carregarDadosCSV(); // Carrega os dados do arquivo CSV
+        for (Carro carro : listaCarros) { // Percorre a lista de dados
+            this.listaDadosEstudantes.add(carro); // Adiciona os dados na lista observable
+        }
     }
 
     public ArrayList<Carro> mostrarCarros() {
@@ -40,7 +52,7 @@ public class CarroController {
 
     }
 
-    public String inserirCarro(Carro Carro) {
+    public void inserirCarro(Carro Carro) {
         // oPlacanizar seus dados de conexão em strings é uma boa ideia!
         String mySQLURL = "jdbc:mysql://localhost:3306/bdalg3"; // informar o NomeDono do banco no final da URL é opcional
         String usuario = "root";
@@ -52,17 +64,12 @@ public class CarroController {
             if (conexao != null) {
                 System.out.println("Conectado com sucesso à instância MySQL!");
             }
-            Carro carro = this.CarroModel.inserir(Carro, conexao); // grava no modelo
+            this.CarroModel.inserir(Carro, conexao); // grava no modelo
             conexao.close(); // fecha a conexão com o banco - sempre fechar após o uso!
-            if(carro != null){
-                return "Carro inserido com sucesso!";
-            }
-            
         } catch (Exception e) {
             System.out.println("Houve um problema com a conexão.");
             e.printStackTrace();
         }
-        return "Carro com este Placa já existe!";
     }
 
     public String excluirCarroPorPlaca(String Placa) {
@@ -77,13 +84,14 @@ public class CarroController {
             if (conexao != null) {
                 System.out.println("Conectado com sucesso à instância MySQL!");
             }
-            String response = this.CarroModel.excluir(Placa, conexao); // grava no modelo
-            conexao.close();             // fecha a conexão com o banco - sempre fechar após o uso!
-            if(response == null){
-                return "Carro não encontrado!";
+            if (this.CarroModel.buscarPorPlaca(Placa, conexao) != null) { // verifica no modelo
+                this.CarroModel.excluir(Placa, conexao); // grava no modelo
+                conexao.close();
+                return "Carro excluído com sucesso!";
             }
-            return "Carro excluído com sucesso!";
-
+            conexao.close();
+            return "Carro não encontrado!";
+            // fecha a conexão com o banco - sempre fechar após o uso!
         } catch (Exception e) {
             e.printStackTrace();
             return "Houve um problema com a conexão.";
@@ -137,5 +145,21 @@ public class CarroController {
             e.printStackTrace();
             return null;
         }
+    }
+    // Parte do CSV
+    public ObservableList<Carro> getListaDadosEstudantes() { // Obtém a lista de dados do tipo Estudante
+        return this.listaDadosEstudantes;
+    }
+    public void cadastrarEstudante(Carro estudante) { // Cadastra um novo estudante na lista de dados
+        this.listaDadosEstudantes.add(estudante);
+        this.CSVHandler.salvarDadosCSV(this.listaDadosEstudantes); // Salva os dados no arquivo CSV
+    }
+    public void excluirEstudante(Carro estudante) { // Exclui um estudante da lista de dados
+        this.listaDadosEstudantes.remove(estudante);
+        this.CSVHandler.salvarDadosCSV(this.listaDadosEstudantes); // Salva os dados no arquivo CSV
+    }
+    public void atualizarEstudante(int i, Carro estudante) { // Atualiza um estudante da lista de dados
+        this.listaDadosEstudantes.set(i, estudante);
+        this.CSVHandler.salvarDadosCSV(this.listaDadosEstudantes); // Salva os dados no arquivo CSV
     }
 }

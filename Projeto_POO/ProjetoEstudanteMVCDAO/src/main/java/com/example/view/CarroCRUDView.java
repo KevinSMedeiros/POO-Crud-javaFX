@@ -45,7 +45,7 @@ public class CarroCRUDView {
 
         // TexFields - pesquisa de Carros
         textFieldPesquisa = new TextField();
-        textFieldPesquisa.setPromptText("Pesquisar Carro por Placa ou NomeDono");
+        textFieldPesquisa.setPromptText("Pesquisar Carro por Placa ou pelo nome do dono");
         textFieldPesquisa.setMaxWidth(400);
 
         // Botão para realizar a pesquisa
@@ -63,7 +63,7 @@ public class CarroCRUDView {
         
         // Labels - rótulos de texto
         labelPlaca = new Label("Placa:");
-        labelNomeDono = new Label("NomeDono do(a) Carro:");
+        labelNomeDono = new Label("Nome do dono do Carro:");
         labelModelo = new Label("Modelo:");
 
         // TextFields - campos de entrada de texto

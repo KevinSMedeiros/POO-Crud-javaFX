@@ -120,6 +120,7 @@ public class CarroCRUDView {
             if (newSelection != null) {
                 textFieldNomeDono.setText(newSelection.getNomeDono());
                 textFieldPlaca.setText(newSelection.getPlaca());
+                textFieldModelo.setText(newSelection.getModelo());
             }
         });
 
@@ -147,9 +148,16 @@ public class CarroCRUDView {
         botaoCadastrar.setOnAction(new EventHandler<ActionEvent>() { // Cadastrar Carro
             @Override
             public void handle(ActionEvent e) {
+                
                 Carro Carro = new Carro(textFieldNomeDono.getText(), textFieldPlaca.getText(), textFieldModelo.getText()); // Cria um Carro a partir dos dados das caixas de texto
+                String Response = CarroController.inserirCarro(Carro); // Insere o Carro no banco de dados
+                if(Response.equals("Carro com este Placa já existe!")){ // Verifica se o Carro já existe
+                    mensagemAlerta.setContentText(Response); // Exemplo de mensagem de alerta - você pode criar outras!
+                    mensagemAlerta.showAndWait();
+                    return;
+                }
                 listaDadosCarros.add(Carro); // Insere o Carro na lista observável
-                CarroController.inserirCarro(Carro); // Insere o Carro no banco de dados
+                
                 limparTextFields(); // Limpa caixas de texto
             }
         });
@@ -159,8 +167,14 @@ public class CarroCRUDView {
             public void handle(ActionEvent e) {
                 int i = tabelaCarros.getSelectionModel().getSelectedIndex(); // Pega a posição da linha selecionada da tabela
                 Carro Carro = new Carro(textFieldNomeDono.getText(), textFieldPlaca.getText(), textFieldModelo.getText()); // Cria um Carro a partir dos dados das caixas de texto
+                String response = CarroController.atualizarCarro(Carro); // Atualiza o Carro no banco de dados
+                if(response.equals("Carro com este Placa não existe!")){ // Verifica se o Carro não existe
+                    mensagemAlerta.setContentText(response); // Exemplo de mensagem de alerta - você pode criar outras!
+                    mensagemAlerta.showAndWait();
+                    return;
+                }
                 listaDadosCarros.set(i, Carro); // Atualiza o Carro na lista observável para a posição obtida
-                CarroController.atualizarCarro(Carro); // Atualiza o Carro no banco de dados
+                
                 limparTextFields(); // Limpa caixas de texto
             }
         });
@@ -173,8 +187,14 @@ public class CarroCRUDView {
                     mensagemAlerta.showAndWait();
                 } else {
                     Carro Carro = tabelaCarros.getSelectionModel().getSelectedItem();  // Cria um Carro a partir dos dados linha selecionada na tabela
+                    String response = CarroController.excluirCarroPorPlaca(Carro.getPlaca()); // Exclui o Carro no banco de dados
+                    if(response.equals("Carro não encontrado!")){ // Verifica se o Carro não existe
+                        mensagemAlerta.setContentText(response); // Exemplo de mensagem de alerta - você pode criar outras!
+                        mensagemAlerta.showAndWait();
+                        return;
+                    }
                     listaDadosCarros.remove(Carro); // Remove o Carro da lista observável
-                    CarroController.excluirCarroPorPlaca(Carro.getPlaca()); // Exclui o Carro no banco de dados
+                    
                     limparTextFields(); // Limpa caixas de texto
                 }
             }

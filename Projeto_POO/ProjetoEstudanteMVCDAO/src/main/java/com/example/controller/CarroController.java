@@ -2,10 +2,7 @@ package com.example.controller;
 // Esta é a classe de Controle de Carro que deve gerenciar a comunicação entre Model e View de Carro
 
 import com.example.Carro;
-import com.example.view.CarroCRUDView;
 import com.example.model.*; // import do Modelo
-
-import javafx.stage.Stage;
 
 //imports Java
 import java.sql.Connection;
@@ -43,7 +40,7 @@ public class CarroController {
 
     }
 
-    public void inserirCarro(Carro Carro) {
+    public String inserirCarro(Carro Carro) {
         // oPlacanizar seus dados de conexão em strings é uma boa ideia!
         String mySQLURL = "jdbc:mysql://localhost:3306/bdalg3"; // informar o NomeDono do banco no final da URL é opcional
         String usuario = "root";
@@ -55,12 +52,17 @@ public class CarroController {
             if (conexao != null) {
                 System.out.println("Conectado com sucesso à instância MySQL!");
             }
-            this.CarroModel.inserir(Carro, conexao); // grava no modelo
+            Carro carro = this.CarroModel.inserir(Carro, conexao); // grava no modelo
             conexao.close(); // fecha a conexão com o banco - sempre fechar após o uso!
+            if(carro != null){
+                return "Carro inserido com sucesso!";
+            }
+            
         } catch (Exception e) {
             System.out.println("Houve um problema com a conexão.");
             e.printStackTrace();
         }
+        return "Carro com este Placa já existe!";
     }
 
     public String excluirCarroPorPlaca(String Placa) {
@@ -75,14 +77,13 @@ public class CarroController {
             if (conexao != null) {
                 System.out.println("Conectado com sucesso à instância MySQL!");
             }
-            if (this.CarroModel.buscarPorPlaca(Placa, conexao) != null) { // verifica no modelo
-                this.CarroModel.excluir(Placa, conexao); // grava no modelo
-                conexao.close();
-                return "Carro excluído com sucesso!";
+            String response = this.CarroModel.excluir(Placa, conexao); // grava no modelo
+            conexao.close();             // fecha a conexão com o banco - sempre fechar após o uso!
+            if(response == null){
+                return "Carro não encontrado!";
             }
-            conexao.close();
-            return "Carro não encontrado!";
-            // fecha a conexão com o banco - sempre fechar após o uso!
+            return "Carro excluído com sucesso!";
+
         } catch (Exception e) {
             e.printStackTrace();
             return "Houve um problema com a conexão.";

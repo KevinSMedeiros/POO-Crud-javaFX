@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import com.example.Carro;
 
 public interface CarroDAO {
-    void inserir(Carro Carro, Connection conexao);
+    Carro inserir(Carro Carro, Connection conexao);
 
-    void atualizar(Carro Carro, String NomeDono, Connection conexao);
+    Carro atualizar(Carro Carro, String NomeDono, Connection conexao);
 
-    void excluir(String Placa, Connection conexao);
+    String excluir(String Placa, Connection conexao);
 
     Carro buscarPorPlaca(String Placa, Connection conexao);
 

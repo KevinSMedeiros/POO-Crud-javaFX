@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.sql.DriverManager;
 import com.example.Carro;
 
 public class CarroDAOImpl implements CarroDAO {
@@ -21,13 +20,13 @@ public class CarroDAOImpl implements CarroDAO {
 
     // implementação dos métodos da interface CarroDAO para JDBC/SQL
     @Override
-    public void inserir(Carro Carro, Connection conexao) {
+    public Carro inserir(Carro Carro, Connection conexao) {
         String inserir = "INSERT INTO Carros (CarroNomeDono, CarroPlaca, CarroModelo) VALUES (?, ?, ?)";;
         try {
             Carro existe = this.buscarPorPlaca(Carro.getPlaca(), conexao);
             if(existe != null){
                 System.out.println("Carro com este Placa já existe!");
-                return;
+                return null;
             }
             PreparedStatement statementInserir = conexao.prepareStatement(inserir);
 
@@ -35,17 +34,24 @@ public class CarroDAOImpl implements CarroDAO {
             statementInserir.setString(2, Carro.getPlaca());
             statementInserir.setString(3, Carro.getModelo());
             statementInserir.executeUpdate();
-
+            
             System.out.println(Carro.getNomeDono().toUpperCase()+" registro de Carro inserido com sucesso!");
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return Carro;
     }
 
     @Override
-    public void atualizar(Carro Carro, String NomeDono, Connection conexao) {
+    public Carro atualizar(Carro Carro, String NomeDono, Connection conexao) {
         String atualizar = "UPDATE Carros SET CarroNomeDono=?, CarroModelo=? WHERE CarroPlaca=?";
         try {
+            Carro existe = this.buscarPorPlaca(atualizar, conexao);
+            if(existe == null){
+                System.out.println("Carro com este Placa não existe!");
+                return null;
+            }
             PreparedStatement statementAtualizar = conexao.prepareStatement(atualizar);
             statementAtualizar.setString(1, NomeDono);
             statementAtualizar.setString(2, Carro.getModelo());
@@ -56,22 +62,25 @@ public class CarroDAOImpl implements CarroDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return Carro;
     }
 
     @Override
-    public void excluir(String Placa, Connection conexao) {
+    public String excluir(String Placa, Connection conexao) {
         Carro Carro = this.buscarPorPlaca(Placa, conexao);
         if (Carro != null) {
             System.out.println("Excluindo Carro...");
-            String excluir = "DELETE FROM Carros WHERE CarroPlaca=" + Placa;
+            String excluir = "DELETE FROM Carros WHERE CarroPlaca = ?";
             try {
                 PreparedStatement statementExcluir = conexao.prepareStatement(excluir);
+                statementExcluir.setString(1, Placa);
                 statementExcluir.executeUpdate();
-                System.out.println("Carro excluído com sucesso! " + Carro.getPlaca() + ": " + Carro.getNomeDono().toUpperCase());
+                return "Carro excluído com sucesso!";
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+        return "Carro não encontrado!";
     }
 
     @Override

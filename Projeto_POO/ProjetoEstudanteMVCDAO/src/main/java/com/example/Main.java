@@ -1,10 +1,5 @@
 package com.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-
 import com.example.view.CarroCRUDView;
 
 import java.io.IOException;
@@ -22,17 +17,7 @@ public class Main extends Application { // A classe principal deve estender a cl
     @Override
     public void start(Stage stage) throws IOException {
 
-       
-
-         System.out.println("Hello, Meu projeto MVC + DAO via JDBC!");
-
-        // organizar seus dados de conexão em strings é uma boa ideia!
-        String mySQLURL = "jdbc:mysql://localhost:3306/bdalg3"; // informar o nome do banco no final da URL é opcional
-        String usuario = "root";
-        String senha = "";
-
-
-            CarroController CarroController = new CarroController(); // inicialização da controladora com a conexão do banco
+            CarroController CarroController = new CarroController(); // Instância do controlador
             CarroCRUDView ec = new CarroCRUDView(CarroController);
              
             // Propriedades do palco onde a aplicação acontece
